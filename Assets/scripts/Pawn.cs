@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class Pawn : MonoBehaviour
 {
+
+    [Header("movement")]
+
     public CharacterController characterController;
 
     public float gravity = -9.81f;
@@ -9,11 +12,22 @@ public class Pawn : MonoBehaviour
     public float walkSpeed;
     public float runSpeed;
     public float jumpHeight = 2f;
+
+    [Header("Animation")]
     public Animator animator;
+    public float state;
+
+    [Header("Wepons")]
+    public Weapon weapon;
+    public GameObject weaponPoint;
+    public int currentWeapon;
+
 
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+        if( weapon!=null )  weapon.setInvisable();
+        
     }
 
     void Update()
@@ -35,6 +49,7 @@ public class Pawn : MonoBehaviour
 
         animator.SetBool("grounded", characterController.isGrounded);
         animator.SetFloat("jump", vertcalSpeed);
+        animator.SetFloat("state", state);
 
     }
 
@@ -42,17 +57,25 @@ public class Pawn : MonoBehaviour
 
     public void Forward(float speed)
     {
-        animator.SetFloat("vertical", 0);
-        animator.SetFloat("Horizontal", 1);
+        if (speed != runSpeed)
+        {
+            animator.SetFloat("side", 0);
+            animator.SetFloat("front", 1);
+            animator.SetFloat("run", 0);
+        }
+        else {
+            animator.SetFloat("run", 1);
+        }
 
-        characterController.Move(transform.forward * speed * Time.deltaTime);
+
+            characterController.Move(transform.forward * speed * Time.deltaTime);
     }
 
 
     public void Back(float speed)
     {
-        animator.SetFloat("vertical", 0);
-        animator.SetFloat("Horizontal", -1);
+        animator.SetFloat("side", 0);
+        animator.SetFloat("front", -1);
 
         characterController.Move(-transform.forward * speed * Time.deltaTime);
     }
@@ -60,8 +83,8 @@ public class Pawn : MonoBehaviour
 
     public void Right(float speed)
     {
-        animator.SetFloat("vertical", 1);
-        animator.SetFloat("Horizontal", 0);
+        animator.SetFloat("side", 1);
+        animator.SetFloat("front", 0);
 
         characterController.Move(transform.right * speed * Time.deltaTime);
     }
@@ -69,15 +92,16 @@ public class Pawn : MonoBehaviour
 
     public void Left(float speed)
     {
-        animator.SetFloat("vertical", -1);
-        animator.SetFloat("Horizontal", 0);
+        animator.SetFloat("side", -1);
+        animator.SetFloat("front", 0);
 
         characterController.Move(-transform.right * speed * Time.deltaTime);
     }
     public void StopMoving()
     {
-        animator.SetFloat("vertical", 0);
-        animator.SetFloat("Horizontal", 0);
+        animator.SetFloat("side", 0);
+        animator.SetFloat("front", 0);
+        animator.SetFloat("run", 0);
     }
 
 
@@ -90,4 +114,53 @@ public class Pawn : MonoBehaviour
             vertcalSpeed = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
     }
+
+    public void State() {
+        if (state == 0)
+        {
+            state = 1;
+            if (weapon != null) weapon.setVisable();
+
+        }
+        else { 
+            state = 0;
+            if (weapon != null) weapon.setInvisable();
+        }
+
+    }
+
+    public void WeponSpawn()
+    {
+        if (weapon != null) return;
+
+        weapon = Instantiate(
+            GameManger.Instance.weapons[currentWeapon],
+            weaponPoint.transform
+        );
+
+        weapon.transform.localPosition = Vector3.zero;
+        weapon.transform.localRotation = Quaternion.identity;
+        weapon.transform.localScale = Vector3.one;
+    }
+
+    public void Slash() {
+        Debug.Log("Triggert");
+        animator.SetTrigger("attack");
+    }
+    public void EnableWeaponHit()
+    {
+        Debug.Log("EnableWeaponHit");
+        if (weapon != null)
+            weapon.EnableHit();
+    }
+
+    public void DisableWeaponHit()
+    {
+        Debug.Log("DisableWeaponHit");
+        if (weapon != null)
+            weapon.DisableHit();
+    }
+
+
+
 }

@@ -79,6 +79,19 @@ public class Controller : MonoBehaviour
             pawn.StopMoving();
         }
 
+        //switch state
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            pawn.State();
+            pawn.WeponSpawn();
+
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("Slash");
+            pawn.Slash();
+        }
+
 
     }
 
