@@ -23,7 +23,7 @@ public class CameraController : MonoBehaviour
         yaw = rot.y;
         pitch = rot.x;
 
-        UnlockCursor();  // start unlocked
+        LockCursor();  // start unlocked
     }
 
     void Update()
@@ -61,13 +61,13 @@ public class CameraController : MonoBehaviour
         camPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
-    void LockCursor()
+    public void LockCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    void UnlockCursor()
+    public void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;

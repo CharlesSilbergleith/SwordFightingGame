@@ -11,9 +11,15 @@ public class NPC : MonoBehaviour
     [SerializeField] private NavMeshAgent navMeshAgent;
     [SerializeField] private Vector3 destinationVector;
     public float front, side, state ; // animator floats
-    public float roamTime, maxRoamDistanse, ranX, ranZ; // roam floats
-   
-
+    public float roamTime, maxRoamDistanse,timeTillRoam, ranX, ranZ; // roam floats
+    public float radiusForState, resetStateTimer, timeTillReset,radiusForAttack; // flaots for attacking
+    public Collider[] hitColliders, attackSphere;
+    public Pawn pawnHit, pawnInrange;
+    public Pawn pawn;
+    public Health health;
+    public GameObject Hip;
+    public Weapon weapon;
+    public AudioSource source;
 
 
 
@@ -31,17 +37,41 @@ public class NPC : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        GameManger.Instance.EnemysLeft++;
         animator = GetComponent<Animator>();
         navMeshAgent = GetComponent<NavMeshAgent>();
+        health = GetComponent<Health>();
+        weapon = GetComponentInChildren<Weapon>();
+        source = GetComponent<AudioSource>();
+        NPCManager.Instance.RegisterNPC(this, transform);
 
     }
 
     // Update is called once per frame
     void Update()
     {
+        
+        hitColliders = Physics.OverlapSphere(transform.position, radiusForState);
+        for (int i =0; i< hitColliders.Length; i++){
+            pawnHit = hitColliders[i].GetComponent<Pawn>();
+
+            if (pawnHit != null)
+            {
+                
+                state = 1;
+                break;
+
+            }
+            else
+            {
+                state = 0;
+            }
+            
+        }
+        ifDead();
         animation();
         Roam();
-
+        attck();
 
     }
 
@@ -49,7 +79,9 @@ public class NPC : MonoBehaviour
     
     void Roam() {
 
-
+        if (state != 0) return;
+        ifDead();
+        navMeshAgent.isStopped = false;
         // If NPC has reached destination  reset state
         if (!navMeshAgent.pathPending &&
             navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
@@ -60,10 +92,10 @@ public class NPC : MonoBehaviour
                 front = 0;
             }
         }
-        if (state != 0) return;
+       
 
         if (Time.time > roamTime) {
-            roamTime = Time.time + 20f;
+            roamTime = Time.time + timeTillRoam;
             front = 1;
             float ran = Random.Range(0, 2);
             ranX = transform.position.x + Random.Range(maxRoamDistanse/2 , maxRoamDistanse)* (ran == 1 ? 1 : -1);
@@ -73,6 +105,39 @@ public class NPC : MonoBehaviour
             
         }
 
+
+    }
+    void attck() { 
+        if (state== 0) return;
+        ifDead();
+        navMeshAgent.SetDestination(GameManger.Instance.pawn.returnPosition() );
+        attackSphere = Physics.OverlapSphere(transform.position, radiusForAttack);
+        for (int i = 0; i < attackSphere.Length; i++)
+        {
+            pawnHit = hitColliders[i].GetComponent<Pawn>();
+            pawnInrange = attackSphere[i].GetComponent<Pawn>();
+
+            if (pawnHit != null)
+            {
+                
+                animator.SetTrigger("hit");
+
+
+            }
+            
+           
+
+        }
+
+
+    }
+    void ifDead() {
+        if (health.health <= 0)
+        {
+            navMeshAgent.isStopped = true;
+            
+
+        }
 
     }
 
@@ -95,8 +160,24 @@ public class NPC : MonoBehaviour
         }
 
     }
+    public void EnableWeaponHit()
+    {
+        Debug.Log("EnableWeaponHit");
 
-   
+
+        weapon.EnableHit();
+    }
+
+    public void DisableWeaponHit()
+    {
+        Debug.Log("DisableWeaponHit");
+
+        weapon.DisableHit();
+    }
+
+    public void AxeSound() {
+        source.Play();
+    }
 
 
 }

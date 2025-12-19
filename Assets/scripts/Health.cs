@@ -32,9 +32,12 @@ public class Health : MonoBehaviour
     }
     public void Damage(float damageAmount) { 
         health -= damageAmount;
-        if (health < 0) {
+        if (health <= 0) {
             death.die();
         }
+    }
+    public float healthPercent() { 
+        return health/maxHealth;
     }
 
 

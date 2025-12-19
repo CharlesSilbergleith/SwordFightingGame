@@ -105,6 +105,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
   renderer: {fileID: 0}
+  hitCollider: {fileID: 0}
+  dmg: 100
 --- !u!65 &1140471310716152163
 BoxCollider:
   m_ObjectHideFlags: 0

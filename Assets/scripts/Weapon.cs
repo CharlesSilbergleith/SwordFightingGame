@@ -4,17 +4,20 @@ public class Weapon : MonoBehaviour
 {
     public MeshRenderer renderer;
     public Collider hitCollider;
+    public float dmg;
 
 
 
-    void Awake()
+     void Awake()
     {
         hitCollider = GetComponent<Collider>();
         hitCollider.enabled = false;
     }
 
     public void EnableHit()
+
     {
+
         hitCollider.enabled = true;
     }
 
@@ -44,12 +47,13 @@ public class Weapon : MonoBehaviour
         
 
         NPC enemy = other.GetComponentInParent<NPC>();
-        Health health = other.GetComponentInParent<Health>();
+        Health enemyHealth = other.GetComponentInParent<Health>();
 
         if (enemy != null)
         {
-            health.Damage();
+            enemyHealth.Damage(dmg);
         }
     }
+
 
 }

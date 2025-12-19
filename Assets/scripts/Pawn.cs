@@ -22,12 +22,22 @@ public class Pawn : MonoBehaviour
     public GameObject weaponPoint;
     public int currentWeapon;
 
-
+    [Header("health")]
+    public Health health;
+    public Death death;
+    [Header("Audio")]
+    public AudioClip slice;
+    public AudioClip sheath;
+    [SerializeField]private AudioSource source;
     void Start()
     {
         characterController = GetComponent<CharacterController>();
         if( weapon!=null )  weapon.setInvisable();
-        
+        health = GetComponent<Health>();
+        death = GetComponent<Death>();
+        source = GetComponent<AudioSource>();
+
+
     }
 
     void Update()
@@ -144,23 +154,31 @@ public class Pawn : MonoBehaviour
     }
 
     public void Slash() {
-        Debug.Log("Triggert");
-        animator.SetTrigger("attack");
+        if (state == 1)
+        {
+
+            animator.SetTrigger("attack");
+            
+        }
+
     }
     public void EnableWeaponHit()
     {
-        Debug.Log("EnableWeaponHit");
         if (weapon != null)
             weapon.EnableHit();
     }
 
     public void DisableWeaponHit()
     {
-        Debug.Log("DisableWeaponHit");
         if (weapon != null)
             weapon.DisableHit();
     }
-
+    public Vector3 returnPosition() {
+        return transform.position;
+    }
+    public void SwingSound() {
+        source.Play();
+    }
 
 
 }

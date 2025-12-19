@@ -88,10 +88,14 @@ public class Controller : MonoBehaviour
         }
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Slash");
+           
             pawn.Slash();
         }
-
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+            Debug.Log("Quit");
+        }
 
     }
 
